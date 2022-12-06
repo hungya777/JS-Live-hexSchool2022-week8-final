@@ -1,0 +1,23 @@
+// google fonts
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  color: $black;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+h1, h2, h3, h4, p{
+  margin-bottom: 0px !important;
+}
+// * {
+//   outline: 1px solid black;
+// }
+img {
+  max-width: 100%;
+  height: auto;
+}
+a {
+  display: block;
+  text-decoration: none;
+}

@@ -1,0 +1,30 @@
+// 文字size
+@mixin font-size {
+  &-1 {
+    font-size: $h2-font-size !important;  //32px
+    line-height: 43px;
+  }
+  &-2 {
+    font-size: $h3-font-size !important;  //28px
+    line-height: 38px;
+  }
+  &-3 {
+    font-size: $h4-font-size !important;  //24px
+    line-height: 32px;
+  }
+  &-4 {
+    font-size: $h5-font-size !important;  //20px
+    line-height: 27px;
+  }
+  &-5 {
+    font-size: $font-size-base !important; //16px
+  }
+  &-6 {
+    font-size: $font-size-base * 0.875 !important;  //14px
+  }
+}
+
+@mixin size($width, $height:$width) {
+  width: $width;
+  height: $height;
+}

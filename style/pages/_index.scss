@@ -1,0 +1,148 @@
+.topBar {
+  border-bottom: 40px solid #000000;
+}
+
+.nav-link {
+  &:hover {
+    background-color: $info;
+    color: $white !important;
+    @include media-breakpoint-up(sm) {
+      background-color: $white;
+      color: $info !important;
+    }
+  }
+}
+
+.banner {
+  background-image: url("/images/banner.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 420px;
+}
+.tab-compare {
+  max-width: 730px;
+  .material-icons {
+    font-size: 30px;
+    color: $info;
+  }
+}
+
+.recommand {
+  &-wall {
+    overflow-x: scroll;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .card {
+      max-width: 350px;
+    }
+  }
+  &-cardPhoto {
+    @include size(96px);
+  }
+  &-accountPhoto {
+    @include size(40px);
+  }
+}
+
+// 運送方式: 偽元素-三角形
+.transport-intro {
+  margin: 0 auto;
+  max-width: 700px;
+  .cardImg {
+    @include size(150px);
+    @include media-breakpoint-up(md){
+      @include size(115px);
+    }
+  }
+  .material-icons {
+    font-size: 80px;
+    @include media-breakpoint-up(md){
+      font-size: 60px;
+    }
+  }
+  li {
+    &:not(:last-child) {
+      position: relative;
+      &::after {
+        content: "";
+        position: absolute;
+        top: 220px;
+        right: 62px;
+        border: 14px solid #000000;
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-bottom: 14px solid transparent;
+      }
+      @include media-breakpoint-up(md) {
+        &::after {
+          content: "";
+          position: absolute;
+          top: 49px;
+          right: -55px;
+          border: 10px solid #000000;
+          border-top: 10px solid transparent;
+          border-right: 10px solid transparent;
+          border-bottom: 10px solid transparent;
+        }
+      }
+    }
+  }
+}
+
+.bedType {
+  width: 255px;
+}
+
+.product {
+  &-lists {
+    .card-img-top {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 0px;
+    }
+  }
+  &-label {
+    top: 20px;
+    right: -4px;
+  }
+}
+
+.table-carts {
+  max-width: 920px;
+  &-img {
+    @include size(80px);
+  }
+}
+
+.reserveForm {
+  width: 365px;
+  .btnReserve {
+    width: 100%;
+    @include media-breakpoint-up(md){
+      width: 70%;
+    }
+  }
+}
+
+.orderInfo{
+  &-inputWrap {
+    position: relative;
+  }
+  &-message {
+    position: static;
+    color: #C72424;
+    @include media-breakpoint-up(md){
+      position: absolute;
+      white-space: nowrap; //不換行
+      left: 103%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}

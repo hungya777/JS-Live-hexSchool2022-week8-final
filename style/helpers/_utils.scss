@@ -1,0 +1,47 @@
+.contaner {
+  max-width: 1190px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+//文字-大小
+.fs {
+  @include font-size;
+  @include media-breakpoint-up(md) {
+    &-md {
+      @include font-size;
+    }
+  }
+  @include media-breakpoint-up(lg) {
+    &-lg {
+      @include font-size;
+    }
+  }
+  @include media-breakpoint-up(xl) {
+    &-xl {
+      @include font-size;
+    }
+  }
+}
+
+/* hover */
+//hover效果: 背景次要色
+.hover-bg-secondary {
+  &:hover {
+    background-color: $secondary !important; 
+  }
+}
+
+//hover效果: 文字info色
+.hover-text-info {
+  &:hover {
+    color: $info !important;
+  }
+}
+
+//連結hover效果: 點擊透明度效果
+.hover-link-opacity {
+  &:hover {
+    opacity: 0.7;
+  }
+}
