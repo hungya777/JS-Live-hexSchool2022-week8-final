@@ -12,6 +12,7 @@ const btnReserve = document.querySelector("#btnReserve"); //HTML元素-按鈕【
 let productData = []; //宣告一個陣列，用於存放產品項目
 let cartData = []; //宣告一個陣列，用於存放購物車項目
 
+
 function init(){
   getProductList();  //取得產品列表
   getCartList();  //取得購物車列表
@@ -27,7 +28,7 @@ function getProductList() {
       productData = res.data.products;
       renderProductList(productData);
     }).catch((error)=>{
-      console.log(error);
+      console.log(error.response);
     })
 }
 
@@ -61,7 +62,7 @@ selectProduct.addEventListener('change', (e)=>{
   e.preventDefault(); //取消觸發事件預設行為
   // console.log(e.target.value);
   let productCategory = e.target.value;
-  if(productCategory == "全部"){
+  if(productCategory === "全部"){
     renderProductList(productData); //重新渲染產品列表
   }else{
     const filterData = productData.filter((item)=>{ //透過陣列filter還做篩選 (陣列filter方法是 淺拷貝)
@@ -78,7 +79,7 @@ productList.addEventListener('click', (e)=>{
   // console.log(e.target); //印出點擊到HTML哪個元素
   // console.log(e.target.getAttribute("data-id")); //印出點擊到HTML元素上有屬性data-id的值 (這裡是產品ID)
   let productId = e.target.getAttribute("data-id");
-  if(productId != null){
+  if(productId !== null){
     addProductToCart(productId);
   }
 })
@@ -87,7 +88,7 @@ productList.addEventListener('click', (e)=>{
 function addProductToCart(productId) {
   let itemNum = 1; //產品數量, 預設 1 筆
   cartData.forEach((item)=>{
-    if(item.product.id == productId) {
+    if(item.product.id === productId) {
       itemNum = ++item.quantity; //將已存在購物車中的項目數量+1
     }
   })
@@ -100,7 +101,7 @@ function addProductToCart(productId) {
   .then((res)=>{
     // console.log(res.data);
     swal("成功", "加入一個品項到購物車", "success");
-    getCartList(); // 重新渲染購物車
+    renderCartList(res.data);
   }).catch((error)=>{
     console.log(error);
   })
@@ -111,17 +112,17 @@ function getCartList() {
   axios.get(`https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`)
     .then((res)=>{
       // console.log(res.data);
-      let finalTotal = res.data.finalTotal; //購物車總金額 (後端幫忙計算)
-      cartData = res.data.carts; //購物車資料
-      renderCartList(cartData, finalTotal);
+      renderCartList(res.data);
     }).catch((error)=>{
-      console.log(error);
+      console.log(error.response);
     })
 }
 
 // 重新渲染購物車列表
-function renderCartList(cartData, finalTotal) {
-  // console.log(cartData);
+function renderCartList(responseData) {
+  // console.log(responseData);
+  cartData = responseData.carts; //購物車清單 (陣列格式)
+  let finalTotal = responseData.finalTotal; //購物車總金額 (後端幫忙計算)
   let str = ""; //宣告一個字串，用於組HTML字串
   cartData.forEach((item)=>{
     str += `<tr>
@@ -160,16 +161,16 @@ cartList.addEventListener('click', (e) => {
   e.preventDefault(); //取消觸發事件預設行為
   // console.log(e.target.getAttribute("data-cartId")); //印出點擊到HTML元素上有屬性data-id的值 (這裡是購物車ID)
   const targetClass = e.target.getAttribute("class");
-  if(targetClass == null){
+  if(targetClass === null){
     return;
   }
-  if(targetClass.indexOf("js-reduceCart") != -1 || targetClass.indexOf("js-addCart") != -1){ //點到按鈕【-】or【+】 (購物車數量修改數量)
+  if(targetClass.indexOf("js-reduceCart") !== -1 || targetClass.indexOf("js-addCart") !== -1){ //點到按鈕【-】or【+】 (購物車數量修改數量)
     let itemNum = parseInt(e.target.getAttribute("data-num"));
     let cartId = e.target.getAttribute("data-cartId");
     changeCartItemNum(targetClass, cartId, itemNum);
-  }else if(targetClass.indexOf("js-deleteCartItem") != -1){ //點擊到按鈕【刪除】，則執行刪除品項邏輯
+  }else if(targetClass.indexOf("js-deleteCartItem") !== -1){ //點擊到按鈕【刪除】，則執行刪除品項邏輯
     let cartId = e.target.getAttribute("data-cartId");
-    if(cartId != null){
+    if(cartId !== null){
       deleteCartItem(cartId);
     }
   }
@@ -177,13 +178,13 @@ cartList.addEventListener('click', (e) => {
 
 //購物車-修改數量
 function changeCartItemNum(targetClass, cartId, itemNum){
-  if(targetClass.indexOf("js-reduceCart") != -1){ //按鈕【-】
+  if(targetClass.indexOf("js-reduceCart") !== -1){ //按鈕【-】
     if(itemNum-1 < 1) {
       swal("產品數量不能小於1", "請重新確認!", "info");
     }else{
       itemNum -= 1;
     }
-  }else if(targetClass.indexOf("js-addCart") != -1){ //按鈕【+】
+  }else if(targetClass.indexOf("js-addCart") !== -1){ //按鈕【+】
     itemNum += 1;
   }
   axios.patch(`https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`, {
@@ -194,7 +195,7 @@ function changeCartItemNum(targetClass, cartId, itemNum){
   })
   .then((res)=>{
     // console.log(res.data);
-    getCartList();  //重新渲染購物車
+    renderCartList(res.data);  //重新渲染購物車
   }).catch((error)=>{
     console.log(error);
   })
@@ -205,9 +206,9 @@ function deleteCartItem(cartId) {
   // console.log(cartId);
   axios.delete(`https://livejs-api.hexschool.io/api/livejs/v1/customer/hungya/carts/${cartId}`)
     .then((res)=>{
-      // console.log(res.data.carts);
+      // console.log(res.data);
       swal("成功", "刪除了一筆購物車項目", "success");
-      getCartList();  //重新渲染購物車
+      renderCartList(res.data);  //重新渲染購物車
     }).catch((error)=>{
       console.log(error);
     })
@@ -217,8 +218,9 @@ function deleteCartItem(cartId) {
 function delAllCartItem (){
   axios.delete(`https://livejs-api.hexschool.io/api/livejs/v1/customer/hungya/carts`)
   .then((res)=>{
-    // swal("成功", "刪除購物車所有品項成功", "success");
-    getCartList();  //重新渲染購物車
+    // console.log(res.data);
+    swal("成功", "刪除購物車所有品項成功", "success");
+    renderCartList(res.data);  //重新渲染購物車
   }).catch((error)=>{
     console.log(error);
   })
@@ -228,7 +230,7 @@ function delAllCartItem (){
 //監聽 HTML元素-按鈕【刪除所有品項】
 btnDeleteAllCartItems.addEventListener('click', (e)=>{
   // console.log(e.target);
-  if(cartData.length == 0){
+  if(cartData.length === 0){
     swal("購物車目前無任何品項", "請勿重複點擊!", "info");
     return;
   }
@@ -246,7 +248,7 @@ const inputAddress = document.querySelector("#inputAddress");  //寄送地址
 const inputTrade = document.querySelector("#inputTrade");  //交易方式
 // 監聽 姓名欄位
 inputName.addEventListener('blur', (e)=>{
-  if(e.target.value != ""){
+  if(e.target.value !== ""){
     inputName.nextElementSibling.textContent = ""; //<p>標籤訊息 清空
   }else{
     inputName.nextElementSibling.textContent = "必填";
@@ -255,7 +257,7 @@ inputName.addEventListener('blur', (e)=>{
 // 監聽 Email欄位
 inputEmail.addEventListener('blur', (e)=>{
   // 驗證 Email格式
-  if(e.target.value != ""){
+  if(e.target.value !== ""){
     if(validateEmail(e.target.value)){
       inputEmail.nextElementSibling.textContent = ""; //<p>標籤訊息 清空
     }else{
@@ -268,7 +270,7 @@ inputEmail.addEventListener('blur', (e)=>{
 // 監聽 電話
 inputTel.addEventListener('blur', (e)=>{
   // 驗證 手機號碼 格式
-  if(e.target.value != ""){
+  if(e.target.value !== ""){
     if(validatePhone(e.target.value)){
       inputTel.nextElementSibling.textContent = ""; //<p>標籤訊息 清空
     }else{
@@ -280,7 +282,7 @@ inputTel.addEventListener('blur', (e)=>{
 })
 // 監聽 寄送地址欄位
 inputAddress.addEventListener('blur', (e)=>{
-  if(e.target.value != ""){
+  if(e.target.value !== ""){
     inputAddress.nextElementSibling.textContent = ""; //<p>標籤訊息 清空
   }else{
     inputAddress.nextElementSibling.textContent = "必填";
@@ -293,7 +295,7 @@ btnReserve.addEventListener('click', (e)=>{
   e.preventDefault();
   // console.log(e.target);
   // 先檢查購物車有無資料
-  if(cartData.length == 0){
+  if(cartData.length === 0){
     swal("請先選擇產品加入購物車!", "購物車目前無資料", "info");
     return;
   }
@@ -305,7 +307,7 @@ btnReserve.addEventListener('click', (e)=>{
     inputAddress,
   ];
   // 檢查表單欄位是否有提示訊息，有驗證訊息則跳出alert提示
-  if(checkOrderFormValidate(arrInput) != ""){
+  if(checkOrderFormValidate(arrInput) !== ""){
     swal("欄位未填寫完整", "【填寫預訂資料】有欄位未填寫完整，請確認!", "info");
     return;
   }

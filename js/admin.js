@@ -8,7 +8,7 @@ const headers = {
 };
 
 const orderList = document.querySelector(".js-orderList"); //HTML元素-訂單列表
-const btnDeleteCartItem = document.querySelector(".js-deleteCartItem"); //HTML元素-按鈕【刪除】 (用於刪除單筆訂單)
+
 const btnDeleteAllCartItems = document.querySelector(".js-deleteAllOrdersBtn"); //HTML元素-按鈕【清除全部訂單】
 const selRevenueRatio = document.querySelector(".js-select-revenueRatio"); //HTML元素-選單 (營收比重)
 let orderData = []; //宣告一個陣列，用於存放訂單列表
@@ -23,11 +23,10 @@ init(); //初始化
 function getOrderList() {
   axios.get(`https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`, headers)
     .then((res)=>{
-      // console.log(res.data.orders);
-      orderData = res.data.orders;
-      renderOrderList(orderData);
-      getCategoryRevenueRatio();
-      // getProductRevenueRatio();
+      // console.log(res.data);
+      renderOrderList(res.data); //重新渲染訂單列表
+      getProductRevenueRatio();  //全品項營收比重
+      // getCategoryRevenueRatio();
     })
     .catch((error)=>{
       console.log(error);
@@ -35,7 +34,8 @@ function getOrderList() {
 }
 
 //渲染訂單列表 
-function renderOrderList(orderData) {
+function renderOrderList(responseData) {
+  orderData = responseData.orders;
   let str = "";  //宣告一個字串，用於組HTML字串
   orderData.forEach((item)=>{
     //組訂單項目字串
@@ -73,7 +73,7 @@ orderList.addEventListener('click', (e)=>{
   const targetClass = e.target.getAttribute("class");
   let orderId = e.target.getAttribute("data-orderId");
   // console.log(targetClass);
-  if(targetClass.indexOf("js-changeStatus") != -1){ //改變訂單狀態
+  if(targetClass.indexOf("js-changeStatus") !== -1){ //改變訂單狀態
     let orderStatus = e.target.getAttribute("data-orderStatus");
     let newStatus;
     if(orderStatus == "true"){
@@ -82,7 +82,7 @@ orderList.addEventListener('click', (e)=>{
       newStatus = true;
     }
     changeOrderStatus(orderId, newStatus);
-  }else if(targetClass.indexOf("js-deleteCartItem") != -1){ //刪除一筆訂單
+  }else if(targetClass.indexOf("js-deleteCartItem") !== -1){ //刪除一筆訂單
     deleteCartItem(orderId);
   }
 })
@@ -97,7 +97,7 @@ function changeOrderStatus(orderId, orderStatus){
     }
   },headers).then((res)=>{
     // console.log(res.data);
-    getOrderList(); //重新取得訂單列表
+    renderOrderList(res.data); //重新渲染訂單列表
     swal("成功修改訂單狀態", "", "success");
   }).catch((error)=>{
     console.log(error);
@@ -108,8 +108,8 @@ function changeOrderStatus(orderId, orderStatus){
 function deleteCartItem(orderId){
   // console.log(orderId);
   axios.delete(`https://livejs-api.hexschool.io/api/livejs/v1/admin/hungya/orders/${orderId}`,headers).then((res)=>{
-      // console.log(res);
-      getOrderList();
+      console.log(res.data);
+      renderOrderList(res.data); //重新渲染訂單列表
       swal("成功", "成功刪除一筆訂單", "success");
     }).catch((error)=>{
       console.log(error);
@@ -120,8 +120,8 @@ function deleteCartItem(orderId){
 function delAllOrderItem(){
   axios.delete(`https://livejs-api.hexschool.io/api/livejs/v1/admin/hungya/orders`,headers)
   .then((res)=>{
-    // console.log(res);
-    getOrderList();
+    // console.log(res.data);
+    renderOrderList(res.data); //重新渲染訂單列表
   }).catch((error)=>{
     console.log(error);
   })
@@ -130,7 +130,7 @@ function delAllOrderItem(){
 // 監聽-按鈕【清除全部訂單】
 btnDeleteAllCartItems.addEventListener('click', (e)=>{
   e.preventDefault(); //取消觸發事件預設行為
-  if(orderData.length == 0) {
+  if(orderData.length === 0) {
     swal("目前無任何訂單資料", "", "warning");
     return;
   }
@@ -144,7 +144,7 @@ function getCategoryRevenueRatio() {
   orderData.forEach((item)=>{
     item.products.forEach((productItem)=>{
       // console.log(obj[productItem.category]);
-      if(objCategoryRevenue[productItem.category] == undefined){
+      if(objCategoryRevenue[productItem.category] === undefined){
         objCategoryRevenue[productItem.category] = productItem.price * productItem.quantity;
       }else{
         objCategoryRevenue[productItem.category] += productItem.price * productItem.quantity;
@@ -164,7 +164,7 @@ function getProductRevenueRatio() {
   let objProductRevenue = {}; //宣告一個物件，用於統計各別產品營收
   orderData.forEach((item)=> {
     item.products.forEach((productItem)=> {
-      if(objProductRevenue[productItem.title] == undefined) {
+      if(objProductRevenue[productItem.title] === undefined) {
         objProductRevenue[productItem.title] = productItem.price * productItem.quantity;
       } else {
         objProductRevenue[productItem.title] += productItem.price * productItem.quantity;
@@ -190,7 +190,7 @@ function getProductRevenueRatio() {
     } else {
       // console.log(item[1]);
       objOther["其他"] += item[1];
-      if(index == arrProductRevenue.length-1) { //統計到陣列最後一筆，將「其他」品項放到新陣列中
+      if(index === arrProductRevenue.length-1) { //統計到陣列最後一筆，將「其他」品項放到新陣列中
         newArrProductRevenue.push(Object.entries(objOther)[0]); //將objOther物件透過Object.entries轉成陣列格式資料
       }
     }
@@ -203,7 +203,7 @@ function getProductRevenueRatio() {
 // 營收比重項目切換
 selRevenueRatio.addEventListener('change', (e)=>{
   // console.log(e.target.value);
-  if(e.target.value == "全產品類別營收比重"){
+  if(e.target.value === "全產品類別營收比重"){
     getCategoryRevenueRatio();
   }else{
     getProductRevenueRatio();
